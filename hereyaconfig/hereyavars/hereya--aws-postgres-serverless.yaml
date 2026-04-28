@@ -1,0 +1,11 @@
+---
+profile: dev
+autoDelete: "true"
+
+---
+profile: staging
+autoDelete: "false"
+
+---
+profile: production
+autoDelete: "false"

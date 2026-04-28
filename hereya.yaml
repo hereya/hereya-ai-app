@@ -1,0 +1,15 @@
+packages:
+  hereya/aws-postgres-serverless:
+    version: 0.1.6
+  hereya/aws-file-storage:
+    version: 0.1.1
+  aws/cognito:
+    version: 0.2.4
+  hereya/postmark-client:
+    version: ""
+  hereya/postmark-account-credentials:
+    version: 0.1.0
+deploy:
+  hereya/aws-mcp-app-lambda:
+    version: 0.5.1
+preDeployCommand: npm install && npm run build

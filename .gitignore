@@ -1,0 +1,7 @@
+node_modules
+dist
+.esbuild
+*.js.map
+*.d.ts
+.hereya
+.envrc

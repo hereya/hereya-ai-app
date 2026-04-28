@@ -1,0 +1,39 @@
+{
+  "name": "hereya-ai-app",
+  "version": "0.1.0",
+  "description": "Hereya AI app — clone of hereya/apps published as a hereya-app primitive.",
+  "scripts": {
+    "build:shell": "vite build && node -e \"const fs=require('fs');const h=fs.readFileSync('dist/shell/src/shell/view-shell.html','utf-8');fs.writeFileSync('src/shell/generated.ts','export const VIEW_SHELL_HTML = '+JSON.stringify(h)+';\\n');\"",
+    "build:layer": "esbuild src/runtime/index.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/layer/nodejs/node_modules/hereya/index.js --external:@aws-sdk/*",
+    "build:handler": "esbuild src/handler.ts --bundle --platform=node --target=node22 --outfile=dist/handler.js --format=cjs",
+    "build": "npm run build:shell && npm run build:layer && npm run build:handler",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^25.5.0",
+    "esbuild": "^0.25",
+    "typescript": "^5",
+    "vite": "^6.4.1",
+    "vite-plugin-singlefile": "^2.3.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-acm": "^3.1032.0",
+    "@aws-sdk/client-apigatewayv2": "^3.1020.0",
+    "@aws-sdk/client-cloudfront": "^3.1032.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1028.0",
+    "@aws-sdk/client-lambda": "^3.1020.0",
+    "@aws-sdk/client-rds-data": "^3.1020.0",
+    "@aws-sdk/client-route-53": "^3.1032.0",
+    "@aws-sdk/client-s3": "^3.1020.0",
+    "@aws-sdk/client-secrets-manager": "^3.1007.0",
+    "@aws-sdk/client-ssm": "^3.1030.0",
+    "@aws-sdk/s3-request-presigner": "^3.1020.0",
+    "@modelcontextprotocol/ext-apps": "^1.5.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "handlebars": "^4.7.9",
+    "mustache": "^4.2.0",
+    "zod": "^3.24.0"
+  }
+}
