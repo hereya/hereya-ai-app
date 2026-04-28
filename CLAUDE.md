@@ -22,29 +22,38 @@ This registers a new immutable `hereya/ai-app@<version>` in the registry.
 
 ### Per workspace: deploy
 
+The app declares parameters in `hereyarc.yaml`:
+
+| Parameter | Mandatory | Default | Description |
+| --- | --- | --- | --- |
+| `customDomain` | yes | — | Custom domain that will front the deployed MCP server (e.g. `ai-app-dev.hereyalab.dev`). |
+| `organizationId` | yes | — | UUID of the Hereya org that owns this deployment. |
+| `oauthServerUrl` | no | `https://cloud.hereya.dev` | Hereya Cloud URL the deployed MCP authenticates against. Override only for non-prod clouds. |
+| `lambdaTimeout` | no | `900` | Lambda execution timeout in seconds. AWS max is 900. |
+
+Pass them at deploy time with `-p` (mandatory ones must be set; optional ones inherit defaults if omitted):
+
 ```bash
-hereya app deploy hereya/ai-app -w hereya/hereya-dev
+hereya app deploy hereya/ai-app \
+  -w hereya/hereya-dev \
+  -p customDomain=ai-app-dev.hereyalab.dev \
+  -p organizationId=<org-uuid>
 ```
 
-Per-workspace overrides (custom domain, organization id) come from the bundled `hereyaconfig/hereyavars/hereya--aws-mcp-app-lambda.yaml`, picked by workspace name. To deploy to a workspace not in that file, add a profile block and republish, or pass per-deploy overrides:
+For a non-prod cloud or a different timeout:
 
 ```bash
-hereya app deploy hereya/ai-app -w hereya/some-org --vars-file ./overrides.yaml
+hereya app deploy hereya/ai-app \
+  -w hereya/hereya-staging \
+  -p customDomain=ai-app-staging.hereyalab.dev \
+  -p organizationId=<org-uuid> \
+  -p oauthServerUrl=https://staging-cloud.hereya.dev \
+  -p lambdaTimeout=300
 ```
 
-where `overrides.yaml` is e.g.
+The values are substituted into `hereyaconfig/hereyavars/hereya--aws-mcp-app-lambda.yaml` (which uses `{{customDomain}}`, `{{organizationId}}`, `{{oauthServerUrl}}`, `{{lambdaTimeout}}` placeholders) before package provisioning. The same source artefact serves every deployment.
 
-```yaml
-hereya--aws-mcp-app-lambda.yaml: |
-  ---
-  profile: some-org
-  customDomain: ai-app-some-org.hereyalab.dev
-  organizationId: <org-uuid>
-  oauthServerUrl: https://cloud.hereya.dev
-  timeout: "900"
-```
-
-After deployment, register the MCP server in Claude Desktop using `https://<customDomain>/mcp`, then OAuth through Hereya. On updates, disconnect and reconnect.
+After the deploy completes, register the MCP server in Claude Desktop using `https://<customDomain>/mcp`, then OAuth through Hereya. On updates, disconnect and reconnect.
 
 ### Local dev / testing changes before publishing
 

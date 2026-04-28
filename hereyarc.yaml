@@ -3,3 +3,18 @@ version: 0.1.0
 description: "AI-app — clone of hereya/apps published as a hereya-app primitive."
 kind: app
 visibility: private
+parameters:
+  customDomain:
+    description: "Custom domain that will front the deployed MCP server (e.g. ai-app-dev.hereyalab.dev). Must point at the API Gateway / CloudFront created by aws-mcp-app-lambda."
+    mandatory: true
+  organizationId:
+    description: "UUID of the Hereya organization that owns this deployment. Bounds OAuth + per-org isolation."
+    mandatory: true
+  oauthServerUrl:
+    description: "Hereya Cloud URL the deployed MCP authenticates against. Override only when deploying against a non-prod cloud."
+    mandatory: false
+    default: "https://cloud.hereya.dev"
+  lambdaTimeout:
+    description: "Lambda execution timeout in seconds. Default 900 (the AWS Lambda max). Lower this for cost-sensitive deployments where long-running tool calls are not expected."
+    mandatory: false
+    default: "900"

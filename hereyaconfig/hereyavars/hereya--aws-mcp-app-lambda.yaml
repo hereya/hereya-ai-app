@@ -1,9 +1,5 @@
-timeout: "900"
-oauthServerUrl: https://cloud.hereya.dev
+timeout: "{{lambdaTimeout}}"
+oauthServerUrl: "{{oauthServerUrl}}"
 
----
-workspace: hereya-dev
-# REPLACE the placeholders below before publishing v0.1.0 (or override per-deploy
-# via `hereya app deploy hereya/ai-app -w hereya/hereya-dev --vars-file overrides.yaml`).
-customDomain: ai-app-dev.hereyalab.dev
-organizationId: REPLACE_WITH_ORG_UUID
+customDomain: "{{customDomain}}"
+organizationId: "{{organizationId}}"
