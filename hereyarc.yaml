@@ -1,5 +1,5 @@
 name: hereya/ai-app
-version: 0.1.1
+version: 0.1.2
 description: "AI-app — clone of hereya/apps published as a hereya-app primitive."
 kind: app
 visibility: private

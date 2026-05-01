@@ -83,3 +83,11 @@ package.json           # scripts, esbuild, vite
 ```
 
 For the in-depth architecture walkthrough (request flow, env vars, primitive list, skills/views storage model), see [`CLAUDE.md`](./CLAUDE.md).
+
+## Claude skill
+
+This repo ships an install prompt at [`skills/hereya-ai-app/install-prompt.md`](./skills/hereya-ai-app/install-prompt.md) that teaches Claude when and how to use this MCP. The skill is parameterised by the personalised name you configured the MCP under — Claude detects that name (or asks), confirms with you, and installs the skill.
+
+To install: paste the contents of `skills/hereya-ai-app/install-prompt.md` into a Claude conversation and follow the prompts. The skill will activate whenever you mention working "in `<your-name>`" or invoke an `mcp__<your-name>__*` tool.
+
+The skill is intentionally thin — it routes Claude into the live `get-instructions` workflows so it never goes stale.
