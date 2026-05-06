@@ -10,7 +10,8 @@ import {
   batchInsert,
   ForbiddenOperationError,
 } from "../db.js";
-import { toolError } from "../errors.js";
+import { toolError, dbErrorToToolError } from "../errors.js";
+import { DatabaseResumingError } from "../retry.js";
 
 export function registerDataTools(server: McpServer) {
   // --- execute ---
@@ -55,7 +56,7 @@ export function registerDataTools(server: McpServer) {
           ],
         };
       } catch (err: any) {
-        return toolError("SQL_ERROR", err.message ?? String(err));
+        return dbErrorToToolError(err);
       }
     }
   );
@@ -120,7 +121,7 @@ export function registerDataTools(server: McpServer) {
           ],
         };
       } catch (err: any) {
-        return toolError("SQL_ERROR", err.message ?? String(err));
+        return dbErrorToToolError(err);
       }
     }
   );
@@ -190,6 +191,9 @@ export function registerDataTools(server: McpServer) {
           ],
         };
       } catch (err: any) {
+        if (err instanceof DatabaseResumingError) {
+          return toolError("DATABASE_RESUMING", err.message);
+        }
         const message = err.message ?? String(err);
         if (message.includes("relation") && message.includes("does not exist")) {
           return toolError("TABLE_NOT_FOUND", message);

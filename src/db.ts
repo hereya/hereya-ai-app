@@ -1,13 +1,19 @@
 import {
   RDSDataClient,
   ExecuteStatementCommand,
+  type ExecuteStatementCommandOutput,
   BatchExecuteStatementCommand,
+  type BatchExecuteStatementCommandOutput,
   BeginTransactionCommand,
+  type BeginTransactionCommandOutput,
   CommitTransactionCommand,
+  type CommitTransactionCommandOutput,
   RollbackTransactionCommand,
+  type RollbackTransactionCommandOutput,
   type SqlParameter,
   type Field,
 } from "@aws-sdk/client-rds-data";
+import { sendWithResumeRetry } from "./retry.js";
 
 const client = new RDSDataClient({ region: process.env.awsRegion });
 
@@ -87,7 +93,8 @@ export class ForbiddenOperationError extends Error {
 // ---------------------------------------------------------------------------
 
 export async function sql(query: string, params?: SqlParameter[]) {
-  return client.send(
+  return sendWithResumeRetry<ExecuteStatementCommandOutput>(
+    client,
     new ExecuteStatementCommand({
       resourceArn: clusterArn(),
       secretArn: secretArn(),
@@ -102,7 +109,8 @@ export async function sqlWithMetadata(
   query: string,
   params?: SqlParameter[]
 ) {
-  return client.send(
+  return sendWithResumeRetry<ExecuteStatementCommandOutput>(
+    client,
     new ExecuteStatementCommand({
       resourceArn: clusterArn(),
       secretArn: secretArn(),
@@ -182,7 +190,8 @@ export async function batchInsert(
   }
 
   // Execute all chunks in a transaction
-  const txn = await client.send(
+  const txn = await sendWithResumeRetry<BeginTransactionCommandOutput>(
+    client,
     new BeginTransactionCommand({
       resourceArn: clusterArn(),
       secretArn: secretArn(),
@@ -194,7 +203,8 @@ export async function batchInsert(
   try {
     let totalInserted = 0;
     for (const chunk of chunks) {
-      const result = await client.send(
+      const result = await sendWithResumeRetry<BatchExecuteStatementCommandOutput>(
+        client,
         new BatchExecuteStatementCommand({
           resourceArn: clusterArn(),
           secretArn: secretArn(),
@@ -208,7 +218,8 @@ export async function batchInsert(
       totalInserted += result.updateResults?.length ?? chunk.length;
     }
 
-    await client.send(
+    await sendWithResumeRetry<CommitTransactionCommandOutput>(
+      client,
       new CommitTransactionCommand({
         resourceArn: clusterArn(),
         secretArn: secretArn(),
@@ -218,7 +229,8 @@ export async function batchInsert(
 
     return totalInserted;
   } catch (err) {
-    await client.send(
+    await sendWithResumeRetry<RollbackTransactionCommandOutput>(
+      client,
       new RollbackTransactionCommand({
         resourceArn: clusterArn(),
         secretArn: secretArn(),

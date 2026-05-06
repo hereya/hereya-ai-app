@@ -274,7 +274,7 @@ export async function createAppBackend(
       Layers: [appLambdaLayerArn()],
       Environment: { Variables: await buildAppEnv(schema) },
       MemorySize: 256,
-      Timeout: 30,
+      Timeout: 60,
     })
   );
 
@@ -383,6 +383,7 @@ export async function redeployAppBackend(schema: string): Promise<void> {
       FunctionName: fnName,
       Layers: [appLambdaLayerArn()],
       Environment: { Variables: await buildAppEnv(schema) },
+      Timeout: 60,
     })
   );
 
